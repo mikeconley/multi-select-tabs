@@ -1,0 +1,9 @@
+{
+  "name": "multi-select-tabs",
+  "description": "A WebExtension that introduces a sidebar that allows you to select one or more tabs in your browser window and perform various operations on them.",
+  "version": "0.1.0",
+  "main": "index.js",
+  "repository": "https://github.com/mikeconley/multi-select-tabs",
+  "author": "Mike Conley (mike.d.conley@gmail.com)",
+  "license": "MIT"
+}
