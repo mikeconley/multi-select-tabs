@@ -51,6 +51,14 @@ have built the addon by running the commands above or this will not work.
 To reload your addon, browse back to [about:debugging][debugging] and click
 `Reload` next ot the `MultiSelect Tabs` entry under `Temporary Extensions`.
 
+You can make webpack re-build the extension whenever files change. To do this, run:
+
+```
+yarn run webpack -- -w
+```
+
+You will still have to reload the extension as above.
+
 
 To contribute a patch, fork this repository and send a pull request. I'd love to
 make this super useful for people.
