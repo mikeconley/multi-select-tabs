@@ -9,13 +9,9 @@ Currently supported operations:
 
 I originally aired the creation of this WebExtension as part of [The Joy of Coding: Episode 100](https://www.reddit.com/r/WatchPeopleCode/comments/6bpb36/live_weekly_1pm_et_on_wednesdays_watch_a_mozilla/).
 
-# TODO
-* Port to React so that we just need to maintain a mirror of tab state in a window
-* Add ability to move selected tabs to new windows
-* Detect and update after tab movement, either when tabs are dragged within the window, or tabs are dragged in or out of a window
-* Add favicons
-* Pretty up the style of the sidebar
-* Add the ability to filter the list of tabs in the sidebar with a search query (probably matching on tab title or URL)
+# Installation
+
+[MultiSelect Tabs can be installed in Firefox Nightly (55) here](https://addons.mozilla.org/en-US/firefox/addon/multiselect-tabs/)
 
 # Contributing
 
@@ -24,4 +20,12 @@ First, clone this repository locally. Then, in a recent build of [Firefox Nightl
 When you make changes, just go back to about:debugging and click on "Reload" next to the MultiSelect Tabs entry under Temporary Extensions.
 
 Please send pull requests if you have them. I'd love to make this super useful for people.
+
+# TODO
+* Port to React so that we just need to maintain a mirror of tab state in a window
+* Add ability to move selected tabs to new windows
+* Detect and update after tab movement, either when tabs are dragged within the window, or tabs are dragged in or out of a window
+* Add favicons
+* Pretty up the style of the sidebar
+* Add the ability to filter the list of tabs in the sidebar with a search query (probably matching on tab title or URL)
 
