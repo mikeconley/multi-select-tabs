@@ -12,7 +12,13 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "sidebar.js",
   },
-  resolve: { extensions: [".js", ".jsx"] },
+  resolve: {
+    extensions: [".js", ".jsx"],
+    modules: [
+      "node_modules",
+      path.resolve(__dirname, "src", "js"),
+    ],
+  },
   module: {
     rules: [
       {
@@ -30,7 +36,12 @@ module.exports = {
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
-          options: { presets: ["babel-preset-react"] },
+          options: { 
+            presets: ["babel-preset-react"],
+            plugins: [
+              ["transform-class-properties", {"spec": true}],
+            ],
+          }, 
         },
       },
     ],
