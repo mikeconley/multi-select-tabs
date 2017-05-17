@@ -1,0 +1,3 @@
+input[type="checkbox"][active] ~ label {
+  font-weight: bold;
+}
