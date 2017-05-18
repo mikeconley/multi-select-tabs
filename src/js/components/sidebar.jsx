@@ -90,6 +90,7 @@ export default class SideBar extends React.Component {
       title: tab.title,
       // TODO: Fix this for when a filter is active
       filtered: false,
+      url: tab.url,
     });
 
     tabIds.splice(tab.index, 0, tab.id);
