@@ -15,6 +15,7 @@ export default class SideBar extends React.Component {
 
     browser.tabs.onActivated.addListener(this._onTabActivated.bind(this));
     browser.tabs.onCreated.addListener(this._onTabCreated.bind(this));
+    browser.tabs.onMoved.addListener(this._onTabMoved.bind(this));
     browser.tabs.onRemoved.addListener(this._onTabRemoved.bind(this));
     browser.tabs.onUpdated.addListener(this._onTabUpdated.bind(this));
 
@@ -81,6 +82,19 @@ export default class SideBar extends React.Component {
     });
 
     tabIds.splice(tab.index, 0, tab.id);
+
+    this.setState(Object.assign({}, this.state));
+  }
+
+  _onTabMoved(tabId, { windowId, fromIndex, toIndex }) {
+    if (windowId !== this.props.windowId) {
+      return;
+    }
+
+    const { tabIds } = this.state;
+
+    tabIds.splice(fromIndex, 1);
+    tabIds.splice(toIndex, 0, tabId);
 
     this.setState(Object.assign({}, this.state));
   }
