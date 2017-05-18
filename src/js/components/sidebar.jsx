@@ -56,7 +56,7 @@ export default class SideBar extends React.Component {
             Gather
           </button>
         </div>
-        <ul>{tabs}</ul>
+        <ul id="tabs-list">{tabs}</ul>
       </div>
     );
   }

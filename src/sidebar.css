@@ -1,3 +1,22 @@
+body {
+  font: message-box;
+}
+
+#tabs-list {
+  list-style-type: none;
+  padding-inline-start: 0px;
+}
+
+#tabs-list > li > label > input[type="checkbox"] {
+  margin-inline-start: : 0px;
+  padding-inline-start: 0px;
+}
+
+#controls {
+  margin-inline-start: 5px;
+}
+
 label.active {
   font-weight: bold;
 }
+
