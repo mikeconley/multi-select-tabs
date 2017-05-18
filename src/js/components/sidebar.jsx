@@ -140,12 +140,24 @@ export default class SideBar extends React.Component {
     this.setState(Object.assign({}, this.state));
   }
 
+  _onLIClicked(event, tabId) {
+    // If the user has clicked on a tab with either Meta (Cmd on
+    // Mac OS keyboards, the "Windows" key on Windows keyboards),
+    // or Shift is pressed, then clicking the LI will cause us
+    // to switch to the clicked tab instead of selecting it.
+    if (event.metaKey || event.shiftKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      browser.tabs.update(tabId, { active: true });
+    }
+  }
+
   _renderTab(tabId, isTabActive, { selected, title, favIconUrl }) {
     const className = isTabActive ? { className: "active" } : {};
     console.log(favIconUrl);
 
     return (
-      <li key={tabId}>
+      <li key={tabId} onClick={e => this._onLIClicked(e, tabId)}>
         <label {...className}>
           <input
             type="checkbox"
