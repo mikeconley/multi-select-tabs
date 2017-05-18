@@ -77,3 +77,5 @@ make this super useful for people.
 * Pretty up the style of the sidebar
 * Add the ability to filter the list of tabs in the sidebar with a search query
   (probably matching on tab title or URL)
+* Make it possible to drag one or more tabs in the sidebar to move them (with automatic Gather when dragging multiple)
+* Convert these TODOs into issues

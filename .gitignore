@@ -1,3 +1,4 @@
 dist/
 node_modules/
 yarn_error.log
+web-ext-artifacts/
