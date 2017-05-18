@@ -30,6 +30,8 @@ export default class SideBar extends React.Component {
         id: tab.id,
         selected: false,
         title: tab.title,
+        filtered: false,
+        url: tab.url,
       });
 
       if (tab.active) {
@@ -55,6 +57,13 @@ export default class SideBar extends React.Component {
           <button id="gather" onClick={() => this._gatherSelected()}>
             Gather
           </button>
+          <input id="filter" type="text" placeholder="Filter tabs…"
+                 onChange={(e) => this._filterChanged(e)} />
+          <label htmlFor="select-all">
+            <input id="select-all" type="checkbox"
+                   onChange={(e) => this._toggleSelectAll(e)}/>
+            Select all tabs
+          </label>
         </div>
         <ul id="tabs-list">{tabs}</ul>
       </div>
@@ -79,6 +88,8 @@ export default class SideBar extends React.Component {
       favIconUrl: tab.favIconUrl,
       id: tab.id,
       title: tab.title,
+      // TODO: Fix this for when a filter is active
+      filtered: false,
     });
 
     tabIds.splice(tab.index, 0, tab.id);
@@ -152,13 +163,50 @@ export default class SideBar extends React.Component {
     }
   }
 
-  _renderTab(tabId, isTabActive, { selected, title, favIconUrl }) {
-    const className = isTabActive ? { className: "active" } : {};
-    console.log(favIconUrl);
+  _filterChanged(event) {
+    let filterStr = event.target.value;
+    // For now, synchronously filter the tabs. We should probably
+    // debounce this.
+    const { tabsById } = this.state;
+    let totalFiltered = 0;
+    for (let [tabId, tab] of tabsById) {
+      let shouldFilter = (!tab.title.includes(filterStr) && !tab.url.includes(filterStr));
+      tab.filtered = shouldFilter;
+
+      if (shouldFilter) {
+        totalFiltered++;
+      }
+    }
+
+    console.log(`Filtered out ${totalFiltered} tabs`);
+    this.setState(Object.assign({}, this.state));
+  }
+
+  _toggleSelectAll(event) {
+    const { tabsById } = this.state;
+    for (let [tabId, tab] of tabsById) {
+      tab.selected = !tab.filtered && event.target.checked;
+    }
+
+    this.setState(Object.assign({}, this.state));
+  }
+
+  _renderTab(tabId, isTabActive, { selected, title, favIconUrl, filtered }) {
+    const classes = [];
+
+    if (isTabActive) {
+      classes.push("active");
+    }
+
+    if (filtered) {
+      classes.push("filtered");
+    }
+
+    const liAttrs = { className: classes.join(" ") };
 
     return (
-      <li key={tabId} onClick={e => this._onLIClicked(e, tabId)}>
-        <label {...className}>
+      <li {...liAttrs} key={tabId} onClick={e => this._onLIClicked(e, tabId)}>
+        <label>
           <input
             type="checkbox"
             checked={selected}

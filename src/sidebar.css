@@ -41,6 +41,11 @@ body {
   margin-inline-start: 5px;
 }
 
-label.active {
+li.active > label {
   font-weight: bold;
+}
+
+.hidden,
+.filtered {
+  display: none;
 }
