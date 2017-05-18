@@ -33,7 +33,7 @@ can then build the extension by running:
 yarn run webpack
 ```
 
-To build for production (e.g., for publsihing on [addons.mozilla.org][amo]),
+To build for production (e.g., for publishing on [addons.mozilla.org][amo]),
 set the `NODE_ENV` environment variable to `PRODUCTION`. i.e,
 
 ```
@@ -44,12 +44,12 @@ yarn run webpack
 This will result in the bundle using the production version of React.
 
 To test this addon, you require a recent build if [Firefox Nightly][nighty]. Go
-to [about:debugging](debugging) and choose `Load Temporary Add-On`. Browse to
-your local checkout and select `manifest.json` to load the add-on. Make sure you
-have built the addon by running the commands above or this will not work.
+to `about:debugging` and choose `Load Temporary Add-On`. Browse to your local
+checkout and select `manifest.json` to load the add-on. Make sure you have
+built the addon by running the commands above or this will not work.
 
-To reload your addon, browse back to [about:debugging][debugging] and click
-`Reload` next ot the `MultiSelect Tabs` entry under `Temporary Extensions`.
+To reload your addon, browse back to `about:debugging` and click `Reload` next
+next to the `MultiSelect Tabs` entry under `Temporary Extensions`.
 
 You can make webpack re-build the extension whenever files change. To do this, run:
 
