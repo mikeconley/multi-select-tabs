@@ -18,6 +18,6 @@
 
   "sidebar_action": {
     "default_title": "MultiSelect Tabs",
-    "default_panel": "sidebar.html"
+    "default_panel": "dist/sidebar.html"
   }
 }
