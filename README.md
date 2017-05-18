@@ -71,11 +71,8 @@ make this super useful for people.
 
 ## TODO
 
-* Port to React so that we just need to maintain a mirror of tab state in a
-  window
 * Add ability to move selected tabs to new windows
-* Detect and update after tab movement, either when tabs are dragged within the
-  window, or tabs are dragged in or out of a window
+* Detect and update after tabs are dragged in or out of a window
 * Add favicons
 * Pretty up the style of the sidebar
 * Add the ability to filter the list of tabs in the sidebar with a search query
