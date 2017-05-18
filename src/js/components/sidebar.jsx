@@ -26,7 +26,7 @@ export default class SideBar extends React.Component {
     for (const tab of info.tabs) {
       tabIds.push(tab.id);
       tabsById.set(tab.id, {
-        faviconUrl: tab.faviconUrl,
+        favIconUrl: tab.favIconUrl,
         id: tab.id,
         selected: false,
         title: tab.title,
@@ -76,7 +76,7 @@ export default class SideBar extends React.Component {
 
     const { tabsById, tabIds } = this.state;
     tabsById.set(tab.id, {
-      faviconUrl: tab.faviconUrl,
+      favIconUrl: tab.favIconUrl,
       id: tab.id,
       title: tab.title,
     });
@@ -121,7 +121,7 @@ export default class SideBar extends React.Component {
     const tabInfo = this.state.tabsById.get(tabId);
 
     let changed = false;
-    for (const key of ["faviconURL", "title"]) {
+    for (const key of ["favIconURL", "title"]) {
       if (changeInfo[key]) {
         changed = true;
         tabInfo[key] = changeInfo[key];
@@ -140,8 +140,9 @@ export default class SideBar extends React.Component {
     this.setState(Object.assign({}, this.state));
   }
 
-  _renderTab(tabId, isTabActive, { selected, title }) {
+  _renderTab(tabId, isTabActive, { selected, title, favIconUrl }) {
     const className = isTabActive ? { className: "active" } : {};
+    console.log(favIconUrl);
 
     return (
       <li key={tabId}>
@@ -151,6 +152,7 @@ export default class SideBar extends React.Component {
             checked={selected}
             onChange={e => this._onSelectionChanged(e, tabId)}
           />
+          <img className="favicon" src={favIconUrl} />
           {title}
         </label>
       </li>

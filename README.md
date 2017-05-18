@@ -75,9 +75,9 @@ make this super useful for people.
 * Style pinned tabs differently, and don't allow operations on them that are impossible
 * Add ability to move selected tabs to new windows
 * Detect and update after tabs are dragged in or out of a window
-* Add favicons
 * Pretty up the style of the sidebar
 * Add the ability to filter the list of tabs in the sidebar with a search query
   (probably matching on tab title or URL)
 * Make it possible to drag one or more tabs in the sidebar to move them (with automatic Gather when dragging multiple)
 * Add ability to pin and unpin tabs
+* Add ability to select all / none tabs

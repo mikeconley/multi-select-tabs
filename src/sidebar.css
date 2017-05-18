@@ -5,18 +5,40 @@ body {
 #tabs-list {
   list-style-type: none;
   padding-inline-start: 0px;
+  mask-image: linear-gradient(to left, transparent, black 1em);
 }
 
 #tabs-list > li > label > input[type="checkbox"] {
-  margin-inline-start: : 0px;
   padding-inline-start: 0px;
+  padding-inline-end: 0px;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
+#tabs-list > li {
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 1px;
+}
+
+#tabs-list > li > label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 #controls {
   margin-inline-start: 5px;
 }
 
+.favicon {
+  display: inline;
+  width: 16px;
+  height: 16px;
+  margin-inline-end: 5px;
+  margin-inline-start: 5px;
+}
+
 label.active {
   font-weight: bold;
 }
-
