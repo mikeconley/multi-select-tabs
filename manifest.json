@@ -1,10 +1,10 @@
 {
-  "version": "0.1",
+  "version": "0.2",
 
   "applications": {
     "gecko": {
       "id": "multi-select-tabs@mikeconley.ca",
-      "strict_min_version": "55.0a1"
+      "strict_min_version": "54.0"
     }
   },
 
