@@ -57,9 +57,9 @@ export default class SideBar extends React.Component {
           <button id="gather" onClick={() => this._gatherSelected()}>
             Gather
           </button>
-          <input id="filter" type="text" placeholder="Filter tabs…"
+          <input id="filter" className="block" type="text" placeholder="Filter tabs…"
                  onChange={(e) => this._filterChanged(e)} />
-          <label htmlFor="select-all">
+          <label className="block" htmlFor="select-all">
             <input id="select-all" type="checkbox"
                    onChange={(e) => this._toggleSelectAll(e)}/>
             Select all tabs

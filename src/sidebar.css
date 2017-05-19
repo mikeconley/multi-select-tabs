@@ -29,6 +29,11 @@ body {
 
 #controls {
   margin-inline-start: 5px;
+  border-bottom: 1px solid ThreeDDarkShadow;
+}
+
+.block {
+  display: block;
 }
 
 .favicon {
