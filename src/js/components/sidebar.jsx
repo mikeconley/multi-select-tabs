@@ -6,9 +6,11 @@ import TabInfo from "components/tabInfo";
 export default class SideBar extends React.Component {
   state = {
     activeTabId: null,
+    filter: "",
     selectAll: false,
     tabsBydId: new Map(),
     tabIds: [],
+    filteredTabs: [],
   };
 
   constructor() {
@@ -24,9 +26,9 @@ export default class SideBar extends React.Component {
     this._onTabRemoved = this._onTabRemoved.bind(this);
     this._onTabUpdated = this._onTabUpdated.bind(this);
 
+    this._onFilterChanged = this._onFilterChanged.bind(this);
     this._onSelectionChanged = this._onSelectionChanged.bind(this);
     this._onTabInfoClicked = this._onTabInfoClicked.bind(this);
-
     this._toggleSelectAll = this._toggleSelectAll.bind(this);
     this._gatherSelected = this._gatherSelected.bind(this);
     this._closeSelected = this._closeSelected.bind(this);
@@ -54,7 +56,6 @@ export default class SideBar extends React.Component {
         id: tab.id,
         selected: false,
         title: tab.title,
-        filtered: false,
         url: tab.url,
       });
 
@@ -63,7 +64,13 @@ export default class SideBar extends React.Component {
       }
     }
 
-    this.setState({ activeTabId, tabsById, tabIds });
+    this.setState({
+      ...this.state,
+      activeTabId,
+      tabsById,
+      tabIds,
+      filteredTabs: tabIds.slice(),
+    });
   }
 
   componentWillUnmount() {
@@ -75,10 +82,16 @@ export default class SideBar extends React.Component {
   }
 
   render() {
-    const { activeTabId, selectAll, tabsById, tabIds } = this.state;
-    const tabs = tabIds.map(tabId => {
-      const tabInfo = tabsById.get(tabId);
+    const {
+      activeTabId,
+      filter,
+      filteredTabs,
+      selectAll,
+      tabsById,
+    } = this.state;
 
+    const tabs = filteredTabs.map(tabId => {
+      const tabInfo = tabsById.get(tabId);
       return (
         <TabInfo
           key={tabInfo.id}
@@ -104,7 +117,8 @@ export default class SideBar extends React.Component {
             className="block"
             type="text"
             placeholder="Filter tabs…"
-            onChange={e => this._filterChanged(e)}
+            onChange={this._onFilterChanged}
+            value={filter}
           />
           <label className="block">
             <input
@@ -134,11 +148,9 @@ export default class SideBar extends React.Component {
       return;
     }
 
-    const { tabsById, tabIds } = this.state;
+    const { filter, tabsById, tabIds } = this.state;
     tabsById.set(tab.id, {
       favIconUrl: tab.favIconUrl,
-      // TODO: Fix this for when a filter is active
-      filtered: false,
       id: tab.id,
       selected: false,
       title: tab.title,
@@ -147,7 +159,10 @@ export default class SideBar extends React.Component {
 
     tabIds.splice(tab.index, 0, tab.id);
 
-    this.setState(Object.assign({}, this.state));
+    this.setState({
+      ...this.state,
+      filteredTabs: this._filterTabs(filter),
+    });
   }
 
   _onTabMoved(tabId, { windowId, fromIndex, toIndex }) {
@@ -155,12 +170,15 @@ export default class SideBar extends React.Component {
       return;
     }
 
-    const { tabIds } = this.state;
+    const { filter, tabIds } = this.state;
 
     tabIds.splice(fromIndex, 1);
     tabIds.splice(toIndex, 0, tabId);
 
-    this.setState(Object.assign({}, this.state));
+    this.setState({
+      ...this.state,
+      filteredTabs: this._filterTabs(filter),
+    });
   }
 
   _onTabRemoved(tabId, { windowId, isWindowClosing }) {
@@ -168,13 +186,16 @@ export default class SideBar extends React.Component {
       return;
     }
 
-    const { tabsById, tabIds } = this.state;
+    const { filter, tabsById, tabIds } = this.state;
     const tabIndex = tabIds.indexOf(tabId);
 
     tabIds.splice(tabIndex, 1);
     tabsById.delete(tabId);
 
-    this.setState(Object.assign({}, this.state));
+    this.setState({
+      ...this.state,
+      filteredTabs: this._filterTabs(this.state.filter),
+    });
   }
 
   _onTabUpdated(tabId, changeInfo, tab) {
@@ -193,7 +214,10 @@ export default class SideBar extends React.Component {
     }
 
     if (changed) {
-      this.setState(Object.assign({}, this.state));
+      this.setState({
+        ...this.state,
+        filteredTabs: this._filterTabs(this.state.filter),
+      });
     }
   }
 
@@ -202,7 +226,7 @@ export default class SideBar extends React.Component {
     tabsById.get(tabId).selected = event.target.checked;
 
     this.setState(
-      selectAll ? {...this.state, selectAll: false} : {...this.state}
+      selectAll ? { ...this.state, selectAll: false } : { ...this.state },
     );
   }
 
@@ -218,24 +242,37 @@ export default class SideBar extends React.Component {
     }
   }
 
-  _filterChanged(event) {
-    let filterStr = event.target.value;
-    // For now, synchronously filter the tabs. We should probably
-    // debounce this.
-    const { tabsById } = this.state;
-    let totalFiltered = 0;
-    for (let [tabId, tab] of tabsById) {
-      let shouldFilter =
-        !tab.title.includes(filterStr) && !tab.url.includes(filterStr);
-      tab.filtered = shouldFilter;
+  _filterTabs(filter) {
+    const { tabIds, tabsById } = this.state;
 
-      if (shouldFilter) {
-        totalFiltered++;
-      }
+    if (filter.length === 0) {
+      return tabIds.slice();
     }
 
-    console.log(`Filtered out ${totalFiltered} tabs`);
-    this.setState(Object.assign({}, this.state));
+    filter = filter.toLowerCase();
+
+    return tabIds.reduce((tabs, tabId) => {
+      const tabInfo = tabsById.get(tabId);
+
+      if (
+        tabInfo.url.toLowerCase().includes(filter) ||
+        tabInfo.title.toLowerCase().includes(filter)
+      ) {
+        tabs.push(tabId);
+      }
+
+      return tabs;
+    }, []);
+  }
+
+  _onFilterChanged(event) {
+    const filter = event.target.value;
+
+    this.setState({
+      ...this.state,
+      filter,
+      filteredTabs: this._filterTabs(filter),
+    });
   }
 
   _toggleSelectAll(event) {
@@ -252,6 +289,7 @@ export default class SideBar extends React.Component {
   }
 
   _getSelectedTabIds() {
+    // prettier-ignore
     return Array
       .from(this.state.tabsById.values())
       .reduce((acc, { id, selected }) => {

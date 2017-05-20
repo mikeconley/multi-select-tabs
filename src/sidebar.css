@@ -49,8 +49,3 @@ body {
 li.active > label {
   font-weight: bold;
 }
-
-.hidden,
-.filtered {
-  display: none;
-}
