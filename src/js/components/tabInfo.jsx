@@ -7,8 +7,9 @@ import React from "react";
  * This will render the controls for selecting that tab and render the metadata
  * for the tab as well.
  */
-const TabInfo = function TabInfo({ onClick, onSelectionChanged, tabInfo }) {
-  const { active, favIconUrl, filtered, id, selected, title } = tabInfo;
+const TabInfo = function TabInfo(props) {
+  const { active, onClick, onSelectionChanged, tabInfo } = props;
+  const { favIconUrl, filtered, id, selected, title } = tabInfo;
 
   const classes = [];
 
@@ -36,10 +37,10 @@ const TabInfo = function TabInfo({ onClick, onSelectionChanged, tabInfo }) {
 };
 
 TabInfo.propTypes = {
+  active: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   onSelectionChanged: PropTypes.func.isRequired,
   tabInfo: PropTypes.shape({
-    active: PropTypes.bool.isRequired,
     favIconUrl: PropTypes.string,
     filtered: PropTypes.bool.isRequired,
     id: PropTypes.number.isRequired,
