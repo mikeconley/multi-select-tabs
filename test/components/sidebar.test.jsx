@@ -146,4 +146,34 @@ describe("<SideBar /> with multiple tabs", () => {
       }
     });
   });
+
+  test("removing tabs", done => {
+    const sidebar = mount(<SideBar windowId={testWindowId} />);
+
+    setTimeout(() => {
+      try {
+        expect(browser.windows.get.called).toBe(true);
+
+        browser.tabs.onRemoved.trigger(testTabs[1].id, {
+          windowId: testWindowId,
+          isWindowClsoing: false,
+        });
+
+        expect(sidebar.state().tabIds).toEqual([
+          testTabs[0].id,
+          testTabs[2].id
+        ]);
+
+        const tabs = sidebar.find(TabInfo);
+
+        expect(tabs.length).toBe(2);
+        expect(tabs.at(0).props().tabInfo.id).toBe(testTabs[0].id);
+        expect(tabs.at(1).props().tabInfo.id).toBe(testTabs[2].id);
+
+        done();
+      } catch (e) {
+        done.fail(e);
+      }
+    });
+  });
 });
