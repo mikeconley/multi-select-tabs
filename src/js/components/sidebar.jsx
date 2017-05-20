@@ -180,7 +180,7 @@ export default class SideBar extends React.Component {
 
     let changed = false;
     for (const key of ["favIconUrl", "title"]) {
-      if (changeInfo[key]) {
+      if (changeInfo.hasOwnProperty(key)) {
         changed = true;
         tabInfo[key] = changeInfo[key];
       }
