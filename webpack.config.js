@@ -30,20 +30,7 @@ module.exports = {
           },
         },
       },
-      { test: /\.js$/, exclude: /node_modules/, use: "babel-loader" },
-      {
-        test: /\.jsx$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: { 
-            presets: ["babel-preset-react"],
-            plugins: [
-              ["transform-class-properties", {"spec": true}],
-            ],
-          }, 
-        },
-      },
+      { test: /\.jsx?$/, exclude: /node_modules/, use: "babel-loader" },
     ],
   },
   plugins: [
