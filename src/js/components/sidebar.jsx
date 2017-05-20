@@ -182,7 +182,7 @@ export default class SideBar extends React.Component {
     const tabInfo = this.state.tabsById.get(tabId);
 
     let changed = false;
-    for (const key of ["favIconUrl", "title"]) {
+    for (const key of ["favIconUrl", "title", "url"]) {
       if (changeInfo.hasOwnProperty(key)) {
         changed = true;
         tabInfo[key] = changeInfo[key];
