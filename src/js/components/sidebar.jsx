@@ -52,9 +52,10 @@ export default class SideBar extends React.Component {
       return (
         <TabInfo
           key={tabInfo.id}
+          active={activeTabId === tabId}
           tabInfo={tabInfo}
           onClick={this._onLIClicked.bind(this)}
-          onSelectionChanged={this._onSelectionChanged.bind(this)}}
+          onSelectionChanged={this._onSelectionChanged.bind(this)}
           />
       );
     });

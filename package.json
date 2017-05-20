@@ -8,16 +8,29 @@
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.24.1",
+    "babel-jest": "^20.0.3",
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-react": "^6.24.1",
+    "enzyme": "^2.8.2",
     "file-loader": "^0.11.1",
+    "jest": "^20.0.3",
+    "jsdom": "^10.1.0",
+    "react-test-renderer": "^15.5.4",
+    "sinon-chrome": "^2.2.1",
     "webpack": "^2.5.1"
   },
   "dependencies": {
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
     "react-dom": "^15.5.4"
+  },
+  "jest": {
+    "moduleDirectories": [
+      "./node_modules/",
+      "./src/js/"
+    ]
   }
 }
