@@ -61,7 +61,6 @@ yarn run webpack -- -w
 
 You will still have to reload the extension as above.
 
-
 To contribute a patch, fork this repository and send a pull request. I'd love to
 make this super useful for people.
 
@@ -69,3 +68,12 @@ make this super useful for people.
 [debugging]: about:debugging
 [nightly]: http://nightly.mozilla.org/
 [yarn]: https://github.com/yarnpkg/yarn
+
+
+## Testing
+
+Tests can be run with:
+
+```
+yarn run jest
+```
