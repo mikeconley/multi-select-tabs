@@ -108,4 +108,42 @@ describe("<SideBar /> with multiple tabs", () => {
       }
     });
   });
+
+  test("creating tabs", done => {
+    const sidebar = mount(<SideBar windowId={testWindowId} />);
+
+    setTimeout(() => {
+      try {
+        expect(browser.windows.get.called).toBe(true);
+
+        browser.tabs.onCreated.trigger({
+          favIconUrl: "http://example.com/baz.ico",
+          id: 4,
+          title: "example.com/baz",
+          url: "http://example.com/baz",
+          windowId: testWindowId,
+          index: 3,
+        });
+
+        expect(sidebar.state().tabIds).toEqual([
+          testTabs[0].id,
+          testTabs[1].id,
+          testTabs[2].id,
+          4
+        ]);
+
+        const tabs = sidebar.find(TabInfo);
+
+        expect(tabs.length).toBe(4);
+        expect(tabs.at(0).props().tabInfo.id).toBe(testTabs[0].id);
+        expect(tabs.at(1).props().tabInfo.id).toBe(testTabs[1].id);
+        expect(tabs.at(2).props().tabInfo.id).toBe(testTabs[2].id);
+        expect(tabs.at(3).props().tabInfo.id).toBe(4);
+
+        done();
+      } catch (e) {
+        done.fail(e);
+      }
+    });
+  });
 });
