@@ -213,6 +213,13 @@ describe("<SideBar /> with multiple tabs", () => {
           testTabs[1],
         );
 
+        const tabInfo = sidebar.state().tabsById.get(testTabs[1].id);
+
+        expect(tabInfo.title).toEqual("foo bar baz");
+        expect(tabInfo.hasOwnProperty("favIconUrl")).toBe(true);
+        expect(tabInfo.favIconUrl).toEqual(undefined);
+        expect(tabInfo.url).toEqual("http://example.com/foobarbaz");
+
         expect(tabs.at(1).find("img").length).toBe(0);
 
         done();
