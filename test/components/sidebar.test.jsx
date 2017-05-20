@@ -180,4 +180,48 @@ describe("<SideBar /> with multiple tabs", () => {
     expect(tabInfo.favIconUrl).toEqual(undefined);
     expect(tabInfo.url).toEqual("http://example.com/foobarbaz");
   });
+
+  test("select all", () => {
+    const selectAll = sidebar.find("#select-all");
+    const tabs = sidebar.find(TabInfo);
+    for (let i = 0; i < tabs.length; i++) {
+      expect(tabs.at(i).props().tabInfo.selected).toBe(false);
+    }
+
+    selectAll.simulate("change", { target: { checked: true } });
+    expect(selectAll.props().checked).toBe(true);
+    for (let i = 0; i < tabs.length; i++) {
+      expect(tabs.at(i).props().tabInfo.selected).toBe(true);
+    }
+
+    selectAll.simulate("change", { target: { checked: false } });
+    expect(selectAll.props().checked).toBe(false);
+    for (let i = 0; i < tabs.length; i++) {
+      expect(tabs.at(i).props().tabInfo.selected).toBe(false);
+    } 
+
+    sidebar.find(TabInfo).find("input[type='checkbox']").forEach(node => {
+      node.simulate("change", { target: { checked: true } });
+    });
+
+    expect(selectAll.props().checked).toBe(false);
+    for (let i = 0; i < tabs.length; i++) {
+      expect(tabs.at(i).props().tabInfo.selected).toBe(true);
+    }
+
+    selectAll.simulate("change", { target: { checked: true } });
+    expect(selectAll.props().checked).toBe(true);
+    for (let i = 0; i < tabs.length; i++) {
+      expect(tabs.at(i).props().tabInfo.selected).toBe(true);
+    }
+
+    tabs.at(1).find("input[type='checkbox']").simulate("change", {
+      target: { checked: false },
+    });
+
+    expect(selectAll.props().checked).toBe(false);
+    expect(tabs.at(1).props().tabInfo.selected).toBe(false);
+    expect(tabs.at(0).props().tabInfo.selected).toBe(true);
+    expect(tabs.at(2).props().tabInfo.selected).toBe(true);
+  });
 });

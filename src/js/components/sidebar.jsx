@@ -6,6 +6,7 @@ import TabInfo from "components/tabInfo";
 export default class SideBar extends React.Component {
   state = {
     activeTabId: null,
+    selectAll: false,
     tabsBydId: new Map(),
     tabIds: [],
   };
@@ -26,6 +27,7 @@ export default class SideBar extends React.Component {
     this._onSelectionChanged = this._onSelectionChanged.bind(this);
     this._onTabInfoClicked = this._onTabInfoClicked.bind(this);
 
+    this._toggleSelectAll = this._toggleSelectAll.bind(this);
     this._gatherSelected = this._gatherSelected.bind(this);
     this._closeSelected = this._closeSelected.bind(this);
   }
@@ -73,7 +75,7 @@ export default class SideBar extends React.Component {
   }
 
   render() {
-    const { activeTabId, tabsById, tabIds } = this.state;
+    const { activeTabId, selectAll, tabsById, tabIds } = this.state;
     const tabs = tabIds.map(tabId => {
       const tabInfo = tabsById.get(tabId);
 
@@ -104,11 +106,12 @@ export default class SideBar extends React.Component {
             placeholder="Filter tabs…"
             onChange={e => this._filterChanged(e)}
           />
-          <label className="block" htmlFor="select-all">
+          <label className="block">
             <input
               id="select-all"
               type="checkbox"
-              onChange={e => this._toggleSelectAll(e)}
+              checked={selectAll}
+              onChange={this._toggleSelectAll}
             />
             Select all tabs
           </label>
@@ -195,10 +198,12 @@ export default class SideBar extends React.Component {
   }
 
   _onSelectionChanged(event, tabId) {
-    const { tabsById } = this.state;
+    const { selectAll, tabsById } = this.state;
     tabsById.get(tabId).selected = event.target.checked;
 
-    this.setState(Object.assign({}, this.state));
+    this.setState(
+      selectAll ? {...this.state, selectAll: false} : {...this.state}
+    );
   }
 
   _onTabInfoClicked(event, tabId) {
@@ -235,11 +240,15 @@ export default class SideBar extends React.Component {
 
   _toggleSelectAll(event) {
     const { tabsById } = this.state;
+    const selectAll = event.target.checked;
     for (let [tabId, tab] of tabsById) {
-      tab.selected = !tab.filtered && event.target.checked;
+      tab.selected = !tab.filtered && selectAll;
     }
 
-    this.setState(Object.assign({}, this.state));
+    this.setState({
+      ...this.state,
+      selectAll,
+    });
   }
 
   _getSelectedTabIds() {
