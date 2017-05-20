@@ -1,6 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
 
+import TabInfo from "components/tabInfo";
+
 export default class SideBar extends React.Component {
   state = {
     activeTabId: null,
@@ -44,9 +46,18 @@ export default class SideBar extends React.Component {
 
   render() {
     const { activeTabId, tabsById, tabIds } = this.state;
-    const tabs = tabIds.map(tabId =>
-      this._renderTab(tabId, activeTabId == tabId, tabsById.get(tabId)),
-    );
+    const tabs = tabIds.map(tabId => {
+      const tabInfo = tabsById.get(tabId);
+
+      return (
+        <TabInfo
+          key={tabInfo.id}
+          tabInfo={tabInfo}
+          onClick={this._onLIClicked.bind(this)}
+          onSelectionChanged={this._onSelectionChanged.bind(this)}}
+          />
+      );
+    });
 
     return (
       <div id="sidebar">
@@ -86,7 +97,7 @@ export default class SideBar extends React.Component {
     const { tabsById, tabIds } = this.state;
     tabsById.set(tab.id, {
       favIconUrl: tab.favIconUrl,
-      id: tab.id,
+      tabId: tab.id,
       title: tab.title,
       // TODO: Fix this for when a filter is active
       filtered: false,
@@ -192,34 +203,6 @@ export default class SideBar extends React.Component {
     this.setState(Object.assign({}, this.state));
   }
 
-  _renderTab(tabId, isTabActive, { selected, title, favIconUrl, filtered }) {
-    const classes = [];
-
-    if (isTabActive) {
-      classes.push("active");
-    }
-
-    if (filtered) {
-      classes.push("filtered");
-    }
-
-    const liAttrs = { className: classes.join(" ") };
-
-    return (
-      <li {...liAttrs} key={tabId} onClick={e => this._onLIClicked(e, tabId)}>
-        <label>
-          <input
-            type="checkbox"
-            checked={selected}
-            onChange={e => this._onSelectionChanged(e, tabId)}
-          />
-          <img className="favicon" src={favIconUrl} />
-          {title}
-        </label>
-      </li>
-    );
-  }
-
   _getSelectedTabIds() {
     return Array
       .from(this.state.tabsById.values())
@@ -245,6 +228,6 @@ export default class SideBar extends React.Component {
   }
 }
 
-SideBar.PropTypes = {
-  windowId: PropTypes.number,
+SideBar.propTypes = {
+  windowId: PropTypes.number.isRequired,
 };
