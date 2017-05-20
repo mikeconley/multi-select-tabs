@@ -10,16 +10,36 @@ export default class SideBar extends React.Component {
     tabIds: [],
   };
 
+  constructor() {
+    super();
+
+    /*
+     * Bind our methods to the instance so we can remove them when the component
+     * unmounts.
+     */
+    this._onTabActivated = this._onTabActivated.bind(this);
+    this._onTabCreated = this._onTabCreated.bind(this);
+    this._onTabMoved = this._onTabMoved.bind(this);
+    this._onTabRemoved = this._onTabRemoved.bind(this);
+    this._onTabUpdated = this._onTabUpdated.bind(this);
+
+    this._onSelectionChanged = this._onSelectionChanged.bind(this);
+    this._onTabInfoClicked = this._onTabInfoClicked.bind(this);
+
+    this._gatherSelected = this._gatherSelected.bind(this);
+    this._closeSelected = this._closeSelected.bind(this);
+  }
+
   async componentDidMount() {
     const info = await browser.windows.get(this.props.windowId, {
       populate: true,
     });
 
-    browser.tabs.onActivated.addListener(this._onTabActivated.bind(this));
-    browser.tabs.onCreated.addListener(this._onTabCreated.bind(this));
-    browser.tabs.onMoved.addListener(this._onTabMoved.bind(this));
-    browser.tabs.onRemoved.addListener(this._onTabRemoved.bind(this));
-    browser.tabs.onUpdated.addListener(this._onTabUpdated.bind(this));
+    browser.tabs.onActivated.addListener(this._onTabActivated);
+    browser.tabs.onCreated.addListener(this._onTabCreated);
+    browser.tabs.onMoved.addListener(this._onTabMoved);
+    browser.tabs.onRemoved.addListener(this._onTabRemoved);
+    browser.tabs.onUpdated.addListener(this._onTabUpdated);
 
     const tabsById = new Map();
     const tabIds = [];
@@ -44,6 +64,14 @@ export default class SideBar extends React.Component {
     this.setState({ activeTabId, tabsById, tabIds });
   }
 
+  componentWillUnmount() {
+    browser.tabs.onActivated.removeListener(this._onTabActivated);
+    browser.tabs.onCreated.removeListener(this._onTabCreated);
+    browser.tabs.onMoved.removeListener(this._onTabMoved);
+    browser.tabs.onRemoved.removeListener(this._onTabRemoved);
+    browser.tabs.onUpdated.removeListener(this._onTabUpdated);
+  }
+
   render() {
     const { activeTabId, tabsById, tabIds } = this.state;
     const tabs = tabIds.map(tabId => {
@@ -54,26 +82,34 @@ export default class SideBar extends React.Component {
           key={tabInfo.id}
           active={activeTabId === tabId}
           tabInfo={tabInfo}
-          onClick={this._onLIClicked.bind(this)}
-          onSelectionChanged={this._onSelectionChanged.bind(this)}
-          />
+          onClick={this._onTabInfoClicked}
+          onSelectionChanged={this._onSelectionChanged}
+        />
       );
     });
 
     return (
       <div id="sidebar">
         <div id="controls">
-          <button id="close" onClick={() => this._closeSelected()}>
+          <button id="close" onClick={this._closeSelected}>
             Close
           </button>
-          <button id="gather" onClick={() => this._gatherSelected()}>
+          <button id="gather" onClick={this._gatherSelected}>
             Gather
           </button>
-          <input id="filter" className="block" type="text" placeholder="Filter tabs…"
-                 onChange={(e) => this._filterChanged(e)} />
+          <input
+            id="filter"
+            className="block"
+            type="text"
+            placeholder="Filter tabs…"
+            onChange={e => this._filterChanged(e)}
+          />
           <label className="block" htmlFor="select-all">
-            <input id="select-all" type="checkbox"
-                   onChange={(e) => this._toggleSelectAll(e)}/>
+            <input
+              id="select-all"
+              type="checkbox"
+              onChange={e => this._toggleSelectAll(e)}
+            />
             Select all tabs
           </label>
         </div>
@@ -165,7 +201,7 @@ export default class SideBar extends React.Component {
     this.setState(Object.assign({}, this.state));
   }
 
-  _onLIClicked(event, tabId) {
+  _onTabInfoClicked(event, tabId) {
     // If the user has clicked on a tab with either Meta (Cmd on
     // Mac OS keyboards, the "Windows" key on Windows keyboards),
     // or Shift is pressed, then clicking the LI will cause us
@@ -184,7 +220,8 @@ export default class SideBar extends React.Component {
     const { tabsById } = this.state;
     let totalFiltered = 0;
     for (let [tabId, tab] of tabsById) {
-      let shouldFilter = (!tab.title.includes(filterStr) && !tab.url.includes(filterStr));
+      let shouldFilter =
+        !tab.title.includes(filterStr) && !tab.url.includes(filterStr);
       tab.filtered = shouldFilter;
 
       if (shouldFilter) {
@@ -226,7 +263,7 @@ export default class SideBar extends React.Component {
     const firstId = selectedTabs.shift();
     const index = this.state.tabIds.indexOf(firstId);
 
-    browser.tabs.move(selectedTabs, { windowId: this.props.windowId, index })
+    browser.tabs.move(selectedTabs, { windowId: this.props.windowId, index });
   }
 }
 
