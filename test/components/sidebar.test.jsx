@@ -224,4 +224,41 @@ describe("<SideBar /> with multiple tabs", () => {
     expect(tabs.at(0).props().tabInfo.selected).toBe(true);
     expect(tabs.at(2).props().tabInfo.selected).toBe(true);
   });
+
+  test("filtering", () => {
+    const filter = sidebar.find("#filter");
+
+    filter.simulate("change", { target: { value: "EXAMPLE" } });
+    expect(sidebar.state("filter")).toEqual("EXAMPLE");
+    expect(sidebar.find(TabInfo).length).toBe(3);
+
+    filter.simulate("change", { target: { value: "nonexistant" } });
+    expect(sidebar.find(TabInfo).length).toBe(0);
+
+    browser.tabs.onCreated.trigger({
+      favIconUrl: "http://example.com/baz.ico",
+      id: 4,
+      title: "non-existant",
+      url: "http://nonexistant.example.com/",
+      windowId: testWindowId,
+      index: 3,
+    });
+
+    expect(sidebar.find(TabInfo).length).toBe(1);
+
+    browser.tabs.onUpdated.trigger(
+      testTabs[0].id,
+      {
+        url: "about:non-existant",
+        title: "nonexistant",
+        favIconUrl: undefined,
+      },
+      testTabs[0]
+    );
+
+    expect(sidebar.find(TabInfo).length).toBe(2);
+
+    filter.simulate("change", { target: { value: "" } });
+    expect(sidebar.find(TabInfo).length).toBe(4);
+  })
 });

@@ -9,20 +9,12 @@ import React from "react";
  */
 const TabInfo = function TabInfo(props) {
   const { active, onClick, onSelectionChanged, tabInfo } = props;
-  const { favIconUrl, filtered, id, selected, title } = tabInfo;
+  const { favIconUrl, id, selected, title } = tabInfo;
 
-  const classes = [];
-
-  if (active) {
-    classes.push("active");
-  }
-
-  if (filtered) {
-    classes.push("filtered");
-  }
+  const className = active ? "active" : null;
 
   return (
-    <li className={classes.join(" ")} onClick={e => onClick(e, id)}>
+    <li className={className} onClick={e => onClick(e, id)}>
       <label>
         <input
           type="checkbox"
@@ -42,7 +34,6 @@ TabInfo.propTypes = {
   onSelectionChanged: PropTypes.func.isRequired,
   tabInfo: PropTypes.shape({
     favIconUrl: PropTypes.string,
-    filtered: PropTypes.bool.isRequired,
     id: PropTypes.number.isRequired,
     selected: PropTypes.bool.isRequired,
     title: PropTypes.string.isRequired,
