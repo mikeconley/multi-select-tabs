@@ -260,5 +260,57 @@ describe("<SideBar /> with multiple tabs", () => {
 
     filter.simulate("change", { target: { value: "" } });
     expect(sidebar.find(TabInfo).length).toBe(4);
-  })
+  });
+
+  test("changing filter with select all", () => {
+    const filter = sidebar.find("#filter");
+    const selectAll = sidebar.find("#select-all");
+
+    filter.simulate("change", { target: { value: "nope" } });
+    expect(sidebar.find(TabInfo).exists()).toBe(false);
+
+    selectAll.simulate("change", { target: { checked: true } });
+    expect(sidebar.find(TabInfo).exists()).toBe(false);
+
+    filter.simulate("change", { target: { value: "" } });
+    let tabs = sidebar.find(TabInfo);
+    
+    /*
+     * When the filter clears, the tabs that become unfiltered should be
+     * selected.
+     */
+    expect(tabs.length).toEqual(3);
+    for (let i = 0; i < tabs.length; i++) {
+      expect(tabs.at(i).props().tabInfo.selected).toBe(true);
+    }
+
+    filter.simulate("change", { target: { value: "foo" } });
+
+    tabs = sidebar.find(TabInfo);
+    expect(tabs.length).toEqual(1);
+    expect(tabs.at(0).props().tabInfo.selected).toBe(true);
+
+    /* Unfiltered tabs should not be selected. */
+    const currentState = sidebar.state();
+    expect(currentState.tabsById.get(testTabs[0].id).selected).toBe(false);
+    expect(currentState.tabsById.get(testTabs[2].id).selected).toBe(false);
+
+    selectAll.simulate("change", { target: { checked: false } });
+
+    for (let i = 0; i < tabs.length; i++) {
+      expect(tabs.at(i).props().tabInfo.selected).toBe(false);
+    }
+
+    filter.simulate("change", { target: { value: "" } });
+
+    tabs = sidebar.find(TabInfo);
+    expect(tabs.length).toEqual(3);
+    /*
+     * When the filter clears, the tabs that become unfiltered (that were
+     * previously selected before the filter) should be unselected.
+     */
+    for (let i = 0; i < tabs.length; i++) {
+      expect(tabs.at(i).props().tabInfo.selected).toBe(false);
+    }
+  });
 });
