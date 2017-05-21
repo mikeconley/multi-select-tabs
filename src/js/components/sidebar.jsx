@@ -267,37 +267,59 @@ export default class SideBar extends React.Component {
 
   _onFilterChanged(event) {
     const filter = event.target.value;
+    const { selectAll } = this.state;
+
+    const filteredTabs = this._filterTabs(filter);
+    const tabsById = this._selectAll(
+      filteredTabs,
+      selectAll,
+      this.state.tabsById,
+    );
 
     this.setState({
       ...this.state,
       filter,
-      filteredTabs: this._filterTabs(filter),
+      filteredTabs: filteredTabs,
+      tabsById,
     });
   }
 
   _toggleSelectAll(event) {
-    const { tabsById } = this.state;
+    const { filteredTabs, tabsById } = this.state;
     const selectAll = event.target.checked;
-    for (let [tabId, tab] of tabsById) {
-      tab.selected = !tab.filtered && selectAll;
-    }
 
     this.setState({
       ...this.state,
       selectAll,
+      tabsById: this._selectAll(filteredTabs, selectAll, tabsById),
     });
+  }
+
+  _selectAll(filteredTabs, selectAll, tabsById) {
+    const newTabsById = new Map(
+      Array.from(tabsById.entries()).map(([k, v]) => [
+        k,
+        Object.assign({}, v, { selected: !selectAll }),
+      ]),
+    );
+
+    for (const tabId of filteredTabs) {
+      newTabsById.get(tabId).selected = selectAll;
+    }
+
+    return newTabsById;
   }
 
   _getSelectedTabIds() {
     // prettier-ignore
     return Array
       .from(this.state.tabsById.values())
-      .reduce((acc, { id, selected }) => {
-        if (selected) {
-          acc.push(id);
+      .reduce((selectedTabs, { id, selected }) => {
+        if (selectedTabs) {
+          selectedTabs.push(id);
         }
 
-        return acc;
+        return selectedTabs;
       }, []);
   }
 
