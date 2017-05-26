@@ -315,7 +315,7 @@ export default class SideBar extends React.Component {
     return Array
       .from(this.state.tabsById.values())
       .reduce((selectedTabs, { id, selected }) => {
-        if (selectedTabs) {
+        if (selectedTabs && selected) {
           selectedTabs.push(id);
         }
 
