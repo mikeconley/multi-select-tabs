@@ -43,7 +43,15 @@ export NODE_ENV=PRODUCTION
 yarn run webpack
 ```
 
-This will result in the bundle using the production version of React.
+This will result in the bundle using the production version of React. When building the
+final XPI, use [web-ext](https://www.npmjs.com/package/web-ext) in the root directory
+with:
+
+```
+web-ext build -i test/*
+```
+
+This should put the XPI inside the web-ext-artifacts folder.
 
 To test this addon, you require a recent build if [Firefox Nightly][nighty]. Go
 to `about:debugging` and choose `Load Temporary Add-On`. Browse to your local
