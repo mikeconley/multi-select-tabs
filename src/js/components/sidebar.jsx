@@ -8,9 +8,11 @@ export default class SideBar extends React.Component {
     activeTabId: null,
     filter: "",
     selectAll: false,
-    tabsBydId: new Map(),
+    selectByClick: false,
+    tabsById: new Map(),
     tabIds: [],
     filteredTabs: [],
+    moreActionsShown: false,
   };
 
   constructor() {
@@ -25,6 +27,8 @@ export default class SideBar extends React.Component {
     this._onTabMoved = this._onTabMoved.bind(this);
     this._onTabRemoved = this._onTabRemoved.bind(this);
     this._onTabUpdated = this._onTabUpdated.bind(this);
+    this._onTabAttached = this._onTabAttached.bind(this);
+    this._onTabDetached = this._onTabDetached.bind(this);
 
     this._onFilterChanged = this._onFilterChanged.bind(this);
     this._onSelectionChanged = this._onSelectionChanged.bind(this);
@@ -32,6 +36,8 @@ export default class SideBar extends React.Component {
     this._toggleSelectAll = this._toggleSelectAll.bind(this);
     this._gatherSelected = this._gatherSelected.bind(this);
     this._closeSelected = this._closeSelected.bind(this);
+    this._reloadSelected = this._reloadSelected.bind(this);
+    this._moveSelectedToNewWindow = this._moveSelectedToNewWindow.bind(this);
   }
 
   async componentDidMount() {
@@ -44,6 +50,8 @@ export default class SideBar extends React.Component {
     browser.tabs.onMoved.addListener(this._onTabMoved);
     browser.tabs.onRemoved.addListener(this._onTabRemoved);
     browser.tabs.onUpdated.addListener(this._onTabUpdated);
+    browser.tabs.onDetached.addListener(this._onTabDetached);
+    browser.tabs.onAttached.addListener(this._onTabAttached);
 
     const tabsById = new Map();
     const tabIds = [];
@@ -79,6 +87,8 @@ export default class SideBar extends React.Component {
     browser.tabs.onMoved.removeListener(this._onTabMoved);
     browser.tabs.onRemoved.removeListener(this._onTabRemoved);
     browser.tabs.onUpdated.removeListener(this._onTabUpdated);
+    browser.tabs.onDetached.removeListener(this._onTabDetached);
+    browser.tabs.onAttached.removeListener(this._onTabAttached);
   }
 
   render() {
@@ -88,6 +98,7 @@ export default class SideBar extends React.Component {
       filteredTabs,
       selectAll,
       tabsById,
+      moreActionsShown,
     } = this.state;
 
     const tabs = filteredTabs.map(tabId => {
@@ -103,34 +114,69 @@ export default class SideBar extends React.Component {
       );
     });
 
+    const selectedTabsCount = this._getSelectedTabIds().length;
+    const moreActionsClasses = !moreActionsShown ? "hidden" : "";
+
     return (
       <div id="sidebar">
         <div id="controls">
-          <button id="close" onClick={this._closeSelected}>
-            Close
-          </button>
-          <button id="gather" onClick={this._gatherSelected}>
-            Gather
-          </button>
+          <div id="counter">
+            {selectedTabsCount} / {this.state.tabIds.length} tabs selected
+          </div>
+          <div id="actions">
+            <button id="close" onClick={() => this._closeSelected()}>
+              Close
+            </button>
+            <button id="gather" onClick={() => this._gatherSelected()}>
+              Gather
+            </button>
+            <button id="more" onClick={() => this._toggleMore()}>
+              ...
+            </button>
+          </div>
+          <div id="moreActions" className={moreActionsClasses}>
+            <button
+              id="moveToWindow"
+              onClick={() => this._moveSelectedToNewWindow()}
+            >
+              Create new window
+            </button>
+            <button id="reload" onClick={() => this._reloadSelected()}>
+              Reload
+            </button>
+          </div>
+        </div>
+        <div id="content">
           <input
             id="filter"
             className="block"
             type="text"
             placeholder="Filter tabs…"
-            onChange={this._onFilterChanged}
-            value={filter}
+            onChange={e => this._onFilterChanged(e)}
           />
+
           <label className="block">
             <input
               id="select-all"
               type="checkbox"
-              checked={selectAll}
-              onChange={this._toggleSelectAll}
+              onChange={e => this._toggleSelectAll(e)}
             />
             Select all tabs
           </label>
+
+          <label className="block">
+            <input
+              id="select-click"
+              type="checkbox"
+              onChange={e => this._toggleSelectClick(e)}
+            />
+            Select by click
+          </label>
+
+          <ul id="tabs-list">
+            {tabs}
+          </ul>
         </div>
-        <ul id="tabs-list">{tabs}</ul>
       </div>
     );
   }
@@ -140,7 +186,20 @@ export default class SideBar extends React.Component {
       return;
     }
 
-    this.setState(Object.assign({}, this.state, { activeTabId: tabId }));
+    const state = this.state;
+    const newTabsById = new Map(state.tabsById.entries());
+    const newTab = newTabsById.get(tabId);
+    if (state.selectByClick && !newTab.filtered) {
+      newTabsById.set(
+        tabId,
+        Object.assign({}, newTabsById.get(tabId), { selected: true }),
+      );
+    }
+
+    this.setState({
+      activeTabId: tabId,
+      tabsById: newTabsById,
+    });
   }
 
   _onTabCreated(tab) {
@@ -221,6 +280,18 @@ export default class SideBar extends React.Component {
     }
   }
 
+  async _onTabAttached(tabId, attachInfo) {
+    const tab = await browser.tabs.get(tabId);
+    this._onTabCreated(tab);
+  }
+
+  _onTabDetached(tabId, detachInfo) {
+    this._onTabRemoved(tabId, {
+      windowId: detachInfo.oldWindowId,
+      isWindowClosing: false,
+    });
+  }
+
   _onSelectionChanged(event, tabId) {
     const { selectAll, tabsById } = this.state;
     tabsById.get(tabId).selected = event.target.checked;
@@ -240,6 +311,10 @@ export default class SideBar extends React.Component {
       event.stopPropagation();
       browser.tabs.update(tabId, { active: true });
     }
+  }
+
+  _toggleMore() {
+    this.setState({ moreActionsShown: !this.state.moreActionsShown });
   }
 
   _filterTabs(filter) {
@@ -310,6 +385,10 @@ export default class SideBar extends React.Component {
     return newTabsById;
   }
 
+  _toggleSelectClick(event) {
+    this.setState({ selectByClick: event.target.checked });
+  }
+
   _getSelectedTabIds() {
     // prettier-ignore
     return Array
@@ -325,6 +404,22 @@ export default class SideBar extends React.Component {
 
   _closeSelected() {
     browser.tabs.remove(this._getSelectedTabIds());
+  }
+
+  _reloadSelected() {
+    const selectedTabIds = this._getSelectedTabIds();
+
+    for (const id of selectedTabIds) {
+      browser.tabs.reload(id);
+    }
+  }
+
+  async _moveSelectedToNewWindow() {
+    const selectedTabs = this._getSelectedTabIds();
+    const newWindow = await browser.windows.create({
+      tabId: selectedTabs.shift(),
+    });
+    browser.tabs.move(selectedTabs, { windowId: newWindow.id, index: 1 });
   }
 
   _gatherSelected() {

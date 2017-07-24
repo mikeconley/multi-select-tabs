@@ -18,7 +18,7 @@ body {
 #tabs-list > li {
   white-space: nowrap;
   overflow: hidden;
-  padding: 1px;
+  padding: 1px 0;
 }
 
 #tabs-list > li > label {
@@ -28,6 +28,8 @@ body {
 }
 
 #controls {
+  padding: 5px 0;
+  margin: 5px 0;
   margin-inline-start: 5px;
   border-bottom: 1px solid ThreeDDarkShadow;
 }
@@ -48,4 +50,35 @@ body {
 
 li.active > label {
   font-weight: bold;
+}
+
+.hidden,
+.filtered {
+  display: none;
+}
+
+#controls {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+#filter {
+  width: 100%;
+  margin: 5px 0;
+}
+
+#content {
+  padding: 0 5px;
+}
+
+#select-all,
+#select-click {
+  margin-inline-start: 0px;
+  padding-inline-start: 0px;
+}
+
+#moreActions {
+  width: 100%;
+  margin-top: 5px;
 }
