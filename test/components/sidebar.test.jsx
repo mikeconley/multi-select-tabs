@@ -198,7 +198,7 @@ describe("<SideBar /> with multiple tabs", () => {
     expect(selectAll.props().checked).toBe(false);
     for (let i = 0; i < tabs.length; i++) {
       expect(tabs.at(i).props().tabInfo.selected).toBe(false);
-    } 
+    }
 
     sidebar.find(TabInfo).find("input[type='checkbox']").forEach(node => {
       node.simulate("change", { target: { checked: true } });
@@ -253,7 +253,7 @@ describe("<SideBar /> with multiple tabs", () => {
         title: "nonexistant",
         favIconUrl: undefined,
       },
-      testTabs[0]
+      testTabs[0],
     );
 
     expect(sidebar.find(TabInfo).length).toBe(2);
@@ -274,7 +274,7 @@ describe("<SideBar /> with multiple tabs", () => {
 
     filter.simulate("change", { target: { value: "" } });
     let tabs = sidebar.find(TabInfo);
-    
+
     /*
      * When the filter clears, the tabs that become unfiltered should be
      * selected.
