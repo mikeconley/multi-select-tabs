@@ -8,10 +8,18 @@ import React from "react";
  * for the tab as well.
  */
 const TabInfo = function TabInfo(props) {
-  const { active, onClick, onSelectionChanged, tabInfo } = props;
+  const {
+    active,
+    onClick,
+    onSelectionChanged,
+    tabInfo,
+    pinned,
+  } = props;
   const { favIconUrl, id, selected, title } = tabInfo;
 
-  const className = active ? "active" : null;
+  const activeClassName = active ? "active" : "";
+  const pinnedClassName = pinned ? "pinned" : "";
+  const className = `${activeClassName} ${pinnedClassName}`;
 
   return (
     <li className={className} onClick={e => onClick(e, id)}>
