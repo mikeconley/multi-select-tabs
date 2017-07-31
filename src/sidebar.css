@@ -25,6 +25,8 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  -moz-user-select: none;
 }
 
 #controls {
@@ -81,4 +83,19 @@ li.active > label {
 #moreActions {
   width: 100%;
   margin-top: 5px;
+}
+
+
+.pinned {
+  font-style: italic;
+}
+
+li.pinned + li:not(.pinned) {
+  margin-top: 10px;
+}
+
+#pinInfo {
+  text-transform: uppercase;
+  color: grey;
+  font-size: 80%;
 }

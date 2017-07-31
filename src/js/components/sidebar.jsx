@@ -35,8 +35,10 @@ export default class SideBar extends React.Component {
     this._onTabInfoClicked = this._onTabInfoClicked.bind(this);
     this._toggleSelectAll = this._toggleSelectAll.bind(this);
     this._gatherSelected = this._gatherSelected.bind(this);
+    this._hasPinnedTabs = this._hasPinnedTabs.bind(this);
     this._closeSelected = this._closeSelected.bind(this);
     this._reloadSelected = this._reloadSelected.bind(this);
+    this._pinSelected = this._pinSelected.bind(this);
     this._moveSelectedToNewWindow = this._moveSelectedToNewWindow.bind(this);
   }
 
@@ -65,6 +67,7 @@ export default class SideBar extends React.Component {
         selected: false,
         title: tab.title,
         url: tab.url,
+        pinned: tab.pinned,
       });
 
       if (tab.active) {
@@ -97,12 +100,16 @@ export default class SideBar extends React.Component {
       filter,
       filteredTabs,
       selectAll,
+      tabIds,
       tabsById,
       moreActionsShown,
     } = this.state;
 
     const tabs = filteredTabs.map(tabId => {
       const tabInfo = tabsById.get(tabId);
+      const tabFilteredIndex = filteredTabs.indexOf(tabId);
+
+
       return (
         <TabInfo
           key={tabInfo.id}
@@ -110,12 +117,20 @@ export default class SideBar extends React.Component {
           tabInfo={tabInfo}
           onClick={this._onTabInfoClicked}
           onSelectionChanged={this._onSelectionChanged}
-        />
+          pinned={tabInfo.pinned} />
       );
     });
 
+    const pinnedInfoTitle = this._hasPinnedTabs(filteredTabs)
+      ? <li id="pinInfo">Pinned tabs</li>
+      : null;
+
     const selectedTabsCount = this._getSelectedTabIds().length;
     const moreActionsClasses = !moreActionsShown ? "hidden" : "";
+
+    const hasSelectedPinnedTabs = this._hasPinnedTabs(
+      this._getSelectedTabIds(),
+    );
 
     return (
       <div id="sidebar">
@@ -124,10 +139,16 @@ export default class SideBar extends React.Component {
             {selectedTabsCount} / {this.state.tabIds.length} tabs selected
           </div>
           <div id="actions">
-            <button id="close" onClick={() => this._closeSelected()}>
+            <button
+              id="close"
+              onClick={() => this._closeSelected()}
+              disabled={hasSelectedPinnedTabs}>
               Close
             </button>
-            <button id="gather" onClick={() => this._gatherSelected()}>
+            <button
+              id="gather"
+              onClick={() => this._gatherSelected()}
+              disabled={hasSelectedPinnedTabs}>
               Gather
             </button>
             <button id="more" onClick={() => this._toggleMore()}>
@@ -137,12 +158,14 @@ export default class SideBar extends React.Component {
           <div id="moreActions" className={moreActionsClasses}>
             <button
               id="moveToWindow"
-              onClick={() => this._moveSelectedToNewWindow()}
-            >
+              onClick={() => this._moveSelectedToNewWindow()}>
               Create new window
             </button>
             <button id="reload" onClick={() => this._reloadSelected()}>
               Reload
+            </button>
+            <button id="pin" onClick={() => this._pinSelected()}>
+              (Un)Pin
             </button>
           </div>
         </div>
@@ -152,15 +175,13 @@ export default class SideBar extends React.Component {
             className="block"
             type="text"
             placeholder="Filter tabs…"
-            onChange={e => this._onFilterChanged(e)}
-          />
-
+            onChange={e => this._onFilterChanged(e)} />
           <label className="block">
             <input
               id="select-all"
               type="checkbox"
               onChange={e => this._toggleSelectAll(e)}
-            />
+              checked={selectAll} />
             Select all tabs
           </label>
 
@@ -168,12 +189,12 @@ export default class SideBar extends React.Component {
             <input
               id="select-click"
               type="checkbox"
-              onChange={e => this._toggleSelectClick(e)}
-            />
-            Select by click
+              onChange={e => this._toggleSelectClick(e)} />
+            Select by clicking on tabs
           </label>
 
           <ul id="tabs-list">
+            {pinnedInfoTitle}
             {tabs}
           </ul>
         </div>
@@ -190,10 +211,7 @@ export default class SideBar extends React.Component {
     const newTabsById = new Map(state.tabsById.entries());
     const newTab = newTabsById.get(tabId);
     if (state.selectByClick && !newTab.filtered) {
-      newTabsById.set(
-        tabId,
-        Object.assign({}, newTabsById.get(tabId), { selected: true }),
-      );
+      this._onSelectionChanged({ target: { checked: true } }, tabId);
     }
 
     this.setState({
@@ -214,6 +232,7 @@ export default class SideBar extends React.Component {
       selected: false,
       title: tab.title,
       url: tab.url,
+      pinned: tab.pinned,
     });
 
     tabIds.splice(tab.index, 0, tab.id);
@@ -265,7 +284,7 @@ export default class SideBar extends React.Component {
     const tabInfo = this.state.tabsById.get(tabId);
 
     let changed = false;
-    for (const key of ["favIconUrl", "title", "url"]) {
+    for (const key of ["favIconUrl", "title", "url", "pinned"]) {
       if (changeInfo.hasOwnProperty(key)) {
         changed = true;
         tabInfo[key] = changeInfo[key];
@@ -293,12 +312,19 @@ export default class SideBar extends React.Component {
   }
 
   _onSelectionChanged(event, tabId) {
-    const { selectAll, tabsById } = this.state;
+    const { tabsById, filteredTabs, selectAll } = this.state;
+
     tabsById.get(tabId).selected = event.target.checked;
 
-    this.setState(
-      selectAll ? { ...this.state, selectAll: false } : { ...this.state },
-    );
+    const hasOnlySelectedTabs = filteredTabs.every(id => tabsById.get(id).selected);
+    
+    if (hasOnlySelectedTabs) {
+      this.setState({ ...this.state, selectAll: true });
+    } else {
+      this.setState(
+        selectAll ? { ...this.state, selectAll: false } : { ...this.state },
+      );
+    }
   }
 
   _onTabInfoClicked(event, tabId) {
@@ -402,6 +428,12 @@ export default class SideBar extends React.Component {
       }, []);
   }
 
+  _hasPinnedTabs(filteredTabs) {
+    const { tabsById } = this.state;
+
+    return filteredTabs.some(id => tabsById.get(id).pinned);
+  }
+
   _closeSelected() {
     browser.tabs.remove(this._getSelectedTabIds());
   }
@@ -412,6 +444,16 @@ export default class SideBar extends React.Component {
     for (const id of selectedTabIds) {
       browser.tabs.reload(id);
     }
+  }
+
+  _pinSelected() {
+    const selectedTabIds = this._getSelectedTabIds();
+    const { tabsById } = this.state;
+
+    selectedTabIds.forEach(tabId => {
+      const currentPinStatus = tabsById.get(tabId).pinned;
+      browser.tabs.update(tabId, { pinned: !currentPinStatus });
+    });
   }
 
   async _moveSelectedToNewWindow() {
