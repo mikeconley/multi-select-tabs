@@ -283,6 +283,13 @@ export default class SideBar extends React.Component {
 
     const tabInfo = this.state.tabsById.get(tabId);
 
+    // When attaching a tab to a window
+    // updated can be called before
+    // _onTabAttached was called.
+    if (tabInfo == undefined) {
+      return;
+    }
+
     let changed = false;
     for (const key of ["favIconUrl", "title", "url", "pinned"]) {
       if (changeInfo.hasOwnProperty(key)) {
