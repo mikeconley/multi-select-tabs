@@ -91,6 +91,19 @@ li.active > label {
   font-style: italic;
 }
 
+.discarded {
+  text-decoration: underline;
+  font-style: italic;
+}
+
+.discarded > label > span:before {
+  content: "(";
+}
+
+.discarded > label > span:after {
+  content: ")";
+}
+
 li.pinned + li:not(.pinned) {
   margin-top: 10px;
 }

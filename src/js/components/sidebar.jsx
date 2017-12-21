@@ -37,6 +37,7 @@ export default class SideBar extends React.Component {
     this._gatherSelected = this._gatherSelected.bind(this);
     this._hasPinnedTabs = this._hasPinnedTabs.bind(this);
     this._closeSelected = this._closeSelected.bind(this);
+    this._discardSelected = this._discardSelected.bind(this);
     this._reloadSelected = this._reloadSelected.bind(this);
     this._pinSelected = this._pinSelected.bind(this);
     this._moveSelectedToNewWindow = this._moveSelectedToNewWindow.bind(this);
@@ -68,6 +69,7 @@ export default class SideBar extends React.Component {
         title: tab.title,
         url: tab.url,
         pinned: tab.pinned,
+        discarded: tab.discarded,
       });
 
       if (tab.active) {
@@ -167,6 +169,9 @@ export default class SideBar extends React.Component {
             <button id="pin" onClick={() => this._pinSelected()}>
               (Un)Pin
             </button>
+            <button id="discard" onClick={() => this._discardSelected()}>
+              Discard
+            </button>
           </div>
         </div>
         <div id="content">
@@ -233,6 +238,7 @@ export default class SideBar extends React.Component {
       title: tab.title,
       url: tab.url,
       pinned: tab.pinned,
+      discarded: tab.discarded
     });
 
     tabIds.splice(tab.index, 0, tab.id);
@@ -291,7 +297,7 @@ export default class SideBar extends React.Component {
     }
 
     let changed = false;
-    for (const key of ["favIconUrl", "title", "url", "pinned"]) {
+    for (const key of ["favIconUrl", "title", "url", "pinned", "discarded"]) {
       if (changeInfo.hasOwnProperty(key)) {
         changed = true;
         tabInfo[key] = changeInfo[key];
@@ -451,6 +457,12 @@ export default class SideBar extends React.Component {
     for (const id of selectedTabIds) {
       browser.tabs.reload(id);
     }
+  }
+
+  _discardSelected() {
+    const selectedTabIds = this._getSelectedTabIds();
+
+    browser.tabs.discard(selectedTabIds);
   }
 
   _pinSelected() {

@@ -15,11 +15,12 @@ const TabInfo = function TabInfo(props) {
     tabInfo,
     pinned,
   } = props;
-  const { favIconUrl, id, selected, title } = tabInfo;
+  const { favIconUrl, id, selected, title, discarded } = tabInfo;
 
   const activeClassName = active ? "active" : "";
   const pinnedClassName = pinned ? "pinned" : "";
-  const className = `${activeClassName} ${pinnedClassName}`;
+  const discardedClassName = discarded ? "discarded" : "";
+  const className = `${activeClassName} ${pinnedClassName} ${discardedClassName}`;
 
   return (
     <li className={className} onClick={e => onClick(e, id)}>
@@ -30,7 +31,7 @@ const TabInfo = function TabInfo(props) {
           onChange={e => onSelectionChanged(e, id)}
         />
         <img className="favicon" src={favIconUrl} />
-        {title}
+        <span>{title}</span>
       </label>
     </li>
   );
