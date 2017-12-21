@@ -462,7 +462,9 @@ export default class SideBar extends React.Component {
   _discardSelected() {
     const selectedTabIds = this._getSelectedTabIds();
 
-    browser.tabs.discard(selectedTabIds);
+    if (typeof browser.tabs.discard === "function") {
+      browser.tabs.discard(selectedTabIds);
+    }
   }
 
   _pinSelected() {
